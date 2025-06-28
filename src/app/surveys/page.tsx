@@ -224,7 +224,7 @@ export default function SurveysPage() {
                   </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="border-2 border-white text-white hover:bg-white hover:text-purple-600 font-semibold px-8 py-4 rounded-2xl">
-                  <Link href="/profile" className="flex items-center gap-2">
+                  <Link href="/profile/mmesoma" className="flex items-center gap-2">
                     View Profile
                   </Link>
                 </Button>

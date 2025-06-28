@@ -209,6 +209,172 @@ export const SURVEYS: Survey[] = [
         ]
       }
     ]
+  },
+  {
+    id: 'career-compass',
+    title: 'Career Compass',
+    description: 'Discover your professional strengths and ideal work environment!',
+    emoji: '🧭',
+    category: 'career',
+    xpReward: 120,
+    estimatedTime: 5,
+    questions: [
+      {
+        id: 'c1',
+        text: 'In a team project, which role do you naturally take on?',
+        category: 'social',
+        options: [
+          {
+            text: 'Taking charge and delegating tasks',
+            emoji: '👑',
+            traits: [AVATAR_TRAITS[18]], // Leader
+            points: 15
+          },
+          {
+            text: 'Contributing ideas and creative solutions',
+            emoji: '💡',
+            traits: [AVATAR_TRAITS[0]], // Creative
+            points: 15
+          },
+          {
+            text: 'Analyzing data and solving problems',
+            emoji: '📊',
+            traits: [AVATAR_TRAITS[1]], // Analytical
+            points: 15
+          },
+          {
+            text: 'Supporting team members and maintaining harmony',
+            emoji: '🤝',
+            traits: [AVATAR_TRAITS[19]], // Collaborator
+            points: 15
+          }
+        ]
+      },
+      {
+        id: 'c2',
+        text: 'What energizes you most at work?',
+        category: 'personality',
+        options: [
+          {
+            text: 'Learning new technologies and tools',
+            emoji: '💻',
+            traits: [AVATAR_TRAITS[6]], // Tech-Savvy
+            points: 15
+          },
+          {
+            text: 'Setting and achieving ambitious goals',
+            emoji: '🎯',
+            traits: [AVATAR_TRAITS[13]], // Ambitious
+            points: 15
+          },
+          {
+            text: 'Coming up with innovative solutions',
+            emoji: '🚀',
+            traits: [AVATAR_TRAITS[15]], // Innovative
+            points: 15
+          },
+          {
+            text: 'Building meaningful relationships',
+            emoji: '💝',
+            traits: [AVATAR_TRAITS[5]], // Caring
+            points: 15
+          }
+        ]
+      },
+      {
+        id: 'c3',
+        text: 'How do you prefer to work?',
+        category: 'personality',
+        options: [
+          {
+            text: 'In a fast-paced, dynamic environment',
+            emoji: '⚡',
+            traits: [AVATAR_TRAITS[2]], // Energetic
+            points: 15
+          },
+          {
+            text: 'In a quiet, focused space',
+            emoji: '🧘',
+            traits: [AVATAR_TRAITS[3]], // Calm
+            points: 15
+          },
+          {
+            text: 'With a mix of collaboration and solo work',
+            emoji: '⚖️',
+            traits: [AVATAR_TRAITS[14]], // Balanced
+            points: 15
+          },
+          {
+            text: 'In an environment that encourages experimentation',
+            emoji: '🔬',
+            traits: [AVATAR_TRAITS[4]], // Adventurous
+            points: 15
+          }
+        ]
+      },
+      {
+        id: 'c4',
+        text: "What's your approach to professional growth?",
+        category: 'values',
+        options: [
+          {
+            text: 'Constantly seeking new challenges',
+            emoji: '📈',
+            traits: [AVATAR_TRAITS[13]], // Ambitious
+            points: 15
+          },
+          {
+            text: 'Developing deep expertise in your field',
+            emoji: '📚',
+            traits: [AVATAR_TRAITS[1]], // Analytical
+            points: 15
+          },
+          {
+            text: 'Building a strong professional network',
+            emoji: '🌐',
+            traits: [AVATAR_TRAITS[16]], // Extroverted
+            points: 15
+          },
+          {
+            text: 'Finding work-life balance',
+            emoji: '🎭',
+            traits: [AVATAR_TRAITS[14]], // Balanced
+            points: 15
+          }
+        ]
+      },
+      {
+        id: 'c5',
+        text: 'When facing a work challenge, you typically:',
+        category: 'personality',
+        options: [
+          {
+            text: 'Break it down into smaller tasks',
+            emoji: '📋',
+            traits: [AVATAR_TRAITS[1]], // Analytical
+            points: 15
+          },
+          {
+            text: 'Brainstorm creative solutions',
+            emoji: '🎨',
+            traits: [AVATAR_TRAITS[0]], // Creative
+            points: 15
+          },
+          {
+            text: 'Seek advice from colleagues',
+            emoji: '💭',
+            traits: [AVATAR_TRAITS[19]], // Collaborator
+            points: 15
+          },
+          {
+            text: 'Trust your experience and intuition',
+            emoji: '✨',
+            traits: [AVATAR_TRAITS[12]], // Authentic
+            points: 15
+          }
+        ]
+      }
+    ]
   }
 ];
 
