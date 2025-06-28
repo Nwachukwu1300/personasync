@@ -20,6 +20,7 @@ import { SURVEYS } from '@/lib/surveys';
 import { generateAvatar } from '@/lib/surveys';
 import { calculateXP } from '@/lib/surveys';
 import { AvatarTrait } from '@/lib/types';
+import { UserSession } from '@/lib/user-session';
 
 export default function ConversationalSurveyPage() {
   const params = useParams();
@@ -30,6 +31,7 @@ export default function ConversationalSurveyPage() {
   const [isCompleted, setIsCompleted] = React.useState(false);
   const [earnedXP, setEarnedXP] = React.useState(0);
   const [avatar, setAvatar] = React.useState<any>(null);
+  const [alreadyCompleted, setAlreadyCompleted] = React.useState(false);
 
   // Find the current survey
   const survey = SURVEYS.find(s => s.id === params.id);
@@ -73,7 +75,23 @@ export default function ConversationalSurveyPage() {
       // Survey completed
       const xp = calculateXP(survey, newAnswers);
       const generatedAvatar = generateAvatar(newTraits);
-      setEarnedXP(xp);
+      
+      // Save XP to user's profile if logged in (prevent duplicate completions)
+      let earnedXP = 0;
+      let wasAlreadyCompleted = false;
+      if (UserSession.isLoggedIn()) {
+        const result = UserSession.completeSurvey(survey.id, xp);
+        earnedXP = result.xpEarned;
+        wasAlreadyCompleted = result.alreadyCompleted;
+        
+        // Show different message if already completed
+        if (result.alreadyCompleted) {
+          console.log('Survey already completed - no additional XP awarded');
+        }
+      }
+      
+      setEarnedXP(earnedXP > 0 ? earnedXP : xp); // Show calculated XP even if not earned
+      setAlreadyCompleted(wasAlreadyCompleted);
       setAvatar(generatedAvatar);
       setIsCompleted(true);
     }
@@ -154,17 +172,23 @@ export default function ConversationalSurveyPage() {
                 className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"
               >
                 {/* XP Card */}
-                <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 border-0 rounded-2xl overflow-hidden">
+                <Card className={`border-0 rounded-2xl overflow-hidden ${alreadyCompleted ? 'bg-gradient-to-r from-blue-50 to-purple-50' : 'bg-gradient-to-r from-yellow-50 to-orange-50'}`}>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-3">
-                      <div className="text-lg font-bold text-yellow-700">XP Earned</div>
+                      <div className={`text-lg font-bold ${alreadyCompleted ? 'text-blue-700' : 'text-yellow-700'}`}>
+                        {alreadyCompleted ? 'Survey Retaken' : 'XP Earned'}
+                      </div>
                       <div className="flex items-center gap-2 bg-white rounded-full px-3 py-1 shadow-sm">
-                        <Star className="w-5 h-5 text-yellow-500 fill-current" />
-                        <span className="text-xl font-bold text-yellow-700">+{earnedXP}</span>
+                        <Star className={`w-5 h-5 fill-current ${alreadyCompleted ? 'text-blue-500' : 'text-yellow-500'}`} />
+                        <span className={`text-xl font-bold ${alreadyCompleted ? 'text-blue-700' : 'text-yellow-700'}`}>
+                          {alreadyCompleted ? '0' : `+${earnedXP}`}
+                        </span>
                       </div>
                     </div>
-                    <Progress value={100} className="bg-yellow-200 h-3 mb-2" />
-                    <p className="text-yellow-600 text-sm">Great job! Keep going to level up!</p>
+                    <Progress value={alreadyCompleted ? 50 : 100} className={`h-3 mb-2 ${alreadyCompleted ? 'bg-blue-200' : 'bg-yellow-200'}`} />
+                    <p className={`text-sm ${alreadyCompleted ? 'text-blue-600' : 'text-yellow-600'}`}>
+                      {alreadyCompleted ? 'No additional XP for retaking surveys, but great job exploring!' : 'Great job! Keep going to level up!'}
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -198,7 +222,14 @@ export default function ConversationalSurveyPage() {
                 className="flex flex-col sm:flex-row gap-4"
               >
                 <Button
-                  onClick={() => router.push('/profile/mmesoma')}
+                  onClick={() => {
+                    const currentUser = UserSession.getCurrentUsername();
+                    if (currentUser) {
+                      router.push(`/profile/${currentUser}`);
+                    } else {
+                      router.push('/signup');
+                    }
+                  }}
                   className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-6 rounded-2xl shadow-lg transform hover:scale-105 transition-all"
                 >
                   <div className="flex flex-col items-center mx-2 my-2">

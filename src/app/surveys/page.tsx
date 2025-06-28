@@ -13,14 +13,25 @@ import {
   ArrowRight, 
   Search,
   Filter,
-  TrendingUp
+  TrendingUp,
+  CheckCircle2
 } from "lucide-react";
 import Link from "next/link";
 import { SURVEYS } from "@/lib/surveys";
+import { UserSession } from "@/lib/user-session";
 
 export default function SurveysPage() {
   const [selectedCategory, setSelectedCategory] = React.useState<string>('all');
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [completedSurveys, setCompletedSurveys] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    // Load completed surveys for current user
+    const currentUser = UserSession.getCurrentUser();
+    if (currentUser && currentUser.completedSurveys) {
+      setCompletedSurveys(currentUser.completedSurveys);
+    }
+  }, []);
 
   const categories = [
     { id: 'all', name: 'All Surveys', emoji: '🌟', count: SURVEYS.length },
@@ -105,15 +116,26 @@ export default function SurveysPage() {
 
         {/* Surveys Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredSurveys.map((survey, index) => (
+          {filteredSurveys.map((survey, index) => {
+            const isCompleted = completedSurveys.includes(survey.id);
+            
+            return (
             <motion.div
               key={survey.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="h-full border-0 shadow-xl bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-                <CardContent className="p-6">
+              <Card className={`h-full border-0 shadow-xl bg-white/90 backdrop-blur-sm rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 ${isCompleted ? 'ring-2 ring-green-200' : ''}`}>
+                <CardContent className="p-6 relative">
+                  {/* Completion Badge */}
+                  {isCompleted && (
+                    <div className="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" />
+                      COMPLETED
+                    </div>
+                  )}
+
                   {/* Survey Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-2xl">
@@ -164,16 +186,26 @@ export default function SurveysPage() {
                   </div>
 
                   {/* CTA Button */}
-                  <Button asChild className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 rounded-2xl shadow-lg transform hover:scale-105 transition-all">
-                    <Link href={`/survey/${survey.id}/conversational`} className="flex items-center justify-center gap-2">
-                      Start Survey
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </Button>
+                  {isCompleted ? (
+                    <Button asChild className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 rounded-2xl shadow-lg">
+                      <Link href={`/survey/${survey.id}/conversational`} className="flex items-center justify-center gap-2">
+                        <CheckCircle2 className="w-4 h-4" />
+                        Retake Survey
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button asChild className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 rounded-2xl shadow-lg transform hover:scale-105 transition-all">
+                      <Link href={`/survey/${survey.id}/conversational`} className="flex items-center justify-center gap-2">
+                        Start Survey
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Empty State */}
