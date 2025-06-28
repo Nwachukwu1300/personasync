@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Target, Users, Mic, Star, ArrowRight, Play } from "lucide-react";
+import { Sparkles, Target, Users, Mic, Star, ArrowRight, Play, Zap, Gift } from "lucide-react";
 
 export default function Home() {
   return (
@@ -50,9 +50,9 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
+              className="flex flex-col sm:flex-row gap-4 justify-center"
             >
-              <Button asChild size="lg" className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold px-8 py-4 rounded-2xl shadow-lg transform hover:scale-105 transition-all">
+              <Button asChild size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-xl transform hover:scale-105 transition-all">
                 <Link href="/onboarding" className="flex items-center gap-2">
                   <Play className="w-5 h-5" />
                   Start Your Journey
@@ -180,12 +180,23 @@ export default function Home() {
               <p className="text-xl mb-8 opacity-90">
                 Join the community of self-explorers and unlock your unique personality today!
               </p>
-              <Button asChild size="lg" className="bg-white text-purple-600 hover:bg-gray-100 font-semibold px-8 py-4 rounded-2xl shadow-lg">
-                <Link href="/onboarding" className="flex items-center gap-2">
-                  Start Your Journey
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+                <Button 
+                  size="lg" 
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 text-lg"
+                  asChild
+                >
+                  <Link href="/signup">Start Discovery</Link>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="border-purple-300 text-purple-700 hover:bg-purple-50 px-8 py-3 text-lg"
+                  asChild
+                >
+                  <Link href="/rewards">View Rewards</Link>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </motion.div>
@@ -199,7 +210,7 @@ export default function Home() {
             <span className="text-xl font-bold">PersonaSync</span>
           </div>
           <p className="text-gray-400">
-            © 2024 PersonaSync. Discover, express, and connect through personality-powered experiences.
+            Discover your true self through voice-powered personality exploration
           </p>
         </div>
       </footer>
