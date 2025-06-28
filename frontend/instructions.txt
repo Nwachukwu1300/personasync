@@ -1,0 +1,20 @@
+This is the frontend directory for the project.
+
+All frontend-related code should be placed here, including:
+- UI components and pages (Next.js app)
+- Stylesheets and static assets
+- Feature-specific components and logic
+
+Recommended structure:
+  /app           # Next.js app directory (pages, layouts, etc.)
+  /components    # Reusable UI components
+  /features      # Feature-specific UI and logic
+  /public        # Static assets (images, icons, etc.)
+  /styles        # CSS/SCSS or Tailwind config
+
+To get started:
+1. Install dependencies with `npm install` (run this command inside the frontend directory).
+2. Start the development server with `npm run dev`.
+3. Add or edit components, pages, and styles as needed.
+
+Keep all frontend code and dependencies inside this directory.

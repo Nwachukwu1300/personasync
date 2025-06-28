@@ -1,0 +1,23 @@
+This is the backend directory for the project.
+
+You can add all backend-related code here, such as:
+- API endpoints (e.g., using Express, Fastify, or another framework)
+- Database models and connection logic
+- Controllers, services, and utilities
+- Integrations with external APIs or services
+
+Recommended structure:
+  /controllers   # Business logic for each feature
+  /models        # Database schemas/models
+  /routes        # API route definitions
+  /services      # External API integrations
+  /utils         # Helper functions
+
+To get started:
+1. Choose your backend framework (e.g., Express, Fastify, etc.).
+2. Initialize a new Node.js project here with `npm init -y`.
+3. Install your dependencies (e.g., `npm install express`).
+4. Create your main server file (e.g., `index.js` or `server.js`).
+5. Add your API routes and logic as needed.
+
+Keep all backend code and dependencies inside this directory.
