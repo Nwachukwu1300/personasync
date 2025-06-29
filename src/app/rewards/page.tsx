@@ -189,10 +189,14 @@ export default function RewardsPage() {
   useEffect(() => {
     // Get current user data and ensure XP is initialized
     const user = UserSession.getCurrentUser();
-    if (user && typeof user.xp === 'undefined') {
-      UserSession.setXP(0);
+    if (user) {
+      // Make sure XP is properly initialized
+      if (typeof user.xp === 'undefined') {
+        user.xp = 0;
+        UserSession.setXP(0);
+      }
+      setCurrentUser(user);
     }
-    setCurrentUser(user);
     setLoading(false);
   }, []);
 

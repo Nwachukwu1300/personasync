@@ -36,26 +36,35 @@ export class UserSession {
     const userKey = `${this.USER_PREFIX}${username}`;
     const userData = localStorage.getItem(userKey);
     
-    return userData ? JSON.parse(userData) : null;
+    if (!userData) return null;
+    
+    const user = JSON.parse(userData);
+    // Ensure XP is initialized
+    if (typeof user.xp === 'undefined') {
+      user.xp = 0;
+      this.saveUser(user);
+    }
+    return user;
   }
 
   // Save user data
   private static saveUser(user: UserProfile): void {
-    localStorage.setItem(`${this.USER_PREFIX}${user.username}`, JSON.stringify(user));
-    localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(user));
+    const userKey = `${this.USER_PREFIX}${user.username}`;
+    localStorage.setItem(userKey, JSON.stringify(user));
   }
 
   // Create new user
   static createUser(userData: Omit<UserProfile, 'xp' | 'createdAt' | 'completedSurveys'>): boolean {
     const newUser: UserProfile = {
       ...userData,
-      xp: 0, // Always start with 0 XP
+      xp: 0,
       createdAt: new Date().toISOString(),
-      completedSurveys: [], // Initialize empty completed surveys array
+      completedSurveys: [],
       profileVisibility: 'public'
     };
 
     this.saveUser(newUser);
+    this.setCurrentUser(newUser.username);
     return true;
   }
 
@@ -64,7 +73,7 @@ export class UserSession {
     const currentUser = this.getCurrentUser();
     if (!currentUser) return false;
 
-    currentUser.xp += xpAmount;
+    currentUser.xp = (currentUser.xp || 0) + xpAmount;
     this.saveUser(currentUser);
     return true;
   }
@@ -96,7 +105,7 @@ export class UserSession {
 
     // Add survey to completed list and award XP
     currentUser.completedSurveys.push(surveyId);
-    currentUser.xp += xpAmount;
+    currentUser.xp = (currentUser.xp || 0) + xpAmount;
     this.saveUser(currentUser);
 
     return { success: true, alreadyCompleted: false, xpEarned: xpAmount };
