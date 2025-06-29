@@ -62,7 +62,11 @@ export default function ConversationalSurveyPage() {
   const handleAnswer = (optionIndex: number) => {
     const answer = currentQuestion.options[optionIndex];
     const newAnswers = [...selectedAnswers, answer.text];
-    const newTraits = [...selectedTraits, ...answer.traits];
+    
+    // Only spread traits if they exist
+    const newTraits = answer.traits 
+      ? [...selectedTraits, ...answer.traits]
+      : selectedTraits;
     
     setSelectedAnswers(newAnswers);
     setSelectedTraits(newTraits);

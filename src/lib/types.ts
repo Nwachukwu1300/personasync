@@ -9,15 +9,14 @@ export interface SurveyQuestion {
 
 export interface SurveyOption {
   text: string;
-  emoji: string;
-  traits: AvatarTrait[];
-  points: number;
+  emoji?: string;
+  traits?: AvatarTrait[];
 }
 
 export interface AvatarTrait {
   name: string;
   emoji: string;
-  description: string;
+  description?: string;
   category: 'personality' | 'interests' | 'values' | 'social';
   strength: number; // 1-10
 }
@@ -78,15 +77,21 @@ export interface Avatar {
   characterDescription: string; // For 3D character-style description
 }
 
+export interface Question {
+  id: string;
+  text: string;
+  options: SurveyOption[];
+}
+
 export interface Survey {
   id: string;
   title: string;
   description: string;
+  category: 'product' | 'consumer' | 'feedback' | 'feature';
   emoji: string;
-  questions: SurveyQuestion[];
-  category: 'personality' | 'lifestyle' | 'career' | 'social';
+  estimatedTime: number;
   xpReward: number;
-  estimatedTime: number; // in minutes
+  questions: Question[];
 }
 
 export interface Reward {
@@ -123,4 +128,89 @@ export interface User {
   profileVisibility: 'public' | 'private';
   xp: number;
   createdAt: string;
-} 
+}
+
+// Survey and Response Types
+export interface SurveyResponse {
+  id: string;
+  userId: string;
+  surveyId: string;
+  completedAt: string;
+  xpGained: number;
+  responses: {
+    questionId: string;
+    answer: string;
+  }[];
+}
+
+export interface ResponseDistribution {
+  response: string;
+  count: number;
+}
+
+export interface DailyCompletion {
+  date: string;
+  count: number;
+}
+
+export interface TraitDistribution {
+  trait: string;
+  count: number;
+  percentage: number;
+}
+
+export interface PersonaRank {
+  rank: number;
+  persona: string;
+  percentage: number;
+  emoji: string;
+  count: number;
+}
+
+export interface QuestionAnalytics {
+  question: string;
+  engagement: number;
+  completion: number;
+}
+
+// Dashboard Types
+export interface DashboardStats {
+  totalResponses: number;
+  topPersona: string;
+  averageXp: number;
+  topRegion: string;
+}
+
+export interface ChartData {
+  name: string;
+  value: number;
+}
+
+// Trait insight types
+export interface TraitInsight {
+  trait: string;
+  percentage: number;
+  trend: number;
+}
+
+// Daily statistics types
+export interface DailyStats {
+  date: string;
+  completions: number;
+}
+
+// Generated insight types
+export interface GeneratedInsight {
+  id: string
+  title: string
+  description: string
+  category: 'trait' | 'engagement' | 'performance'
+  priority: 'high' | 'medium' | 'low'
+}
+
+export interface Insight {
+  title: string;
+  description: string;
+}
+
+// Export all types for use in mock data and components 

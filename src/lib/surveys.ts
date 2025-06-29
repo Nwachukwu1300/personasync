@@ -34,344 +34,184 @@ export const AVATAR_TRAITS: AvatarTrait[] = [
 // Sample surveys
 export const SURVEYS: Survey[] = [
   {
-    id: 'personality-discovery',
-    title: 'Personality Discovery',
-    description: 'Uncover your unique personality traits and discover what makes you special!',
-    emoji: '🔍',
-    category: 'personality',
-    xpReward: 100,
-    estimatedTime: 3,
-    questions: [
-      {
-        id: 'q1',
-        text: 'How do you prefer to spend your free time?',
-        category: 'personality',
-        options: [
-          {
-            text: 'Creating something new',
-            emoji: '🎨',
-            traits: [AVATAR_TRAITS[0]], // Creative
-            points: 10
-          },
-          {
-            text: 'Solving puzzles and problems',
-            emoji: '🧩',
-            traits: [AVATAR_TRAITS[1]], // Analytical
-            points: 10
-          },
-          {
-            text: 'Being active and energetic',
-            emoji: '⚡',
-            traits: [AVATAR_TRAITS[2]], // Energetic
-            points: 10
-          },
-          {
-            text: 'Relaxing and reflecting',
-            emoji: '🧘',
-            traits: [AVATAR_TRAITS[3]], // Calm
-            points: 10
-          }
-        ]
-      },
-      {
-        id: 'q2',
-        text: 'When faced with a challenge, you usually...',
-        category: 'personality',
-        options: [
-          {
-            text: 'Jump in headfirst',
-            emoji: '🏃',
-            traits: [AVATAR_TRAITS[4]], // Adventurous
-            points: 10
-          },
-          {
-            text: 'Think it through carefully',
-            emoji: '🤔',
-            traits: [AVATAR_TRAITS[1]], // Analytical
-            points: 10
-          },
-          {
-            text: 'Ask others for help',
-            emoji: '🤝',
-            traits: [AVATAR_TRAITS[19]], // Collaborator
-            points: 10
-          },
-          {
-            text: 'Trust your instincts',
-            emoji: '✨',
-            traits: [AVATAR_TRAITS[12]], // Authentic
-            points: 10
-          }
-        ]
-      },
-      {
-        id: 'q3',
-        text: 'What motivates you most?',
-        category: 'values',
-        options: [
-          {
-            text: 'Helping others succeed',
-            emoji: '💝',
-            traits: [AVATAR_TRAITS[5]], // Caring
-            points: 10
-          },
-          {
-            text: 'Achieving your goals',
-            emoji: '🎯',
-            traits: [AVATAR_TRAITS[13]], // Ambitious
-            points: 10
-          },
-          {
-            text: 'Learning new things',
-            emoji: '📚',
-            traits: [AVATAR_TRAITS[15]], // Innovative
-            points: 10
-          },
-          {
-            text: 'Finding inner peace',
-            emoji: '⚖️',
-            traits: [AVATAR_TRAITS[14]], // Balanced
-            points: 10
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'digital-lifestyle',
-    title: 'Digital Lifestyle',
-    description: 'Explore your relationship with technology and digital culture!',
-    emoji: '💻',
-    category: 'lifestyle',
-    xpReward: 80,
-    estimatedTime: 2,
-    questions: [
-      {
-        id: 'q1',
-        text: 'How do you use social media?',
-        category: 'social',
-        options: [
-          {
-            text: 'Share everything with everyone',
-            emoji: '🌟',
-            traits: [AVATAR_TRAITS[16]], // Extroverted
-            points: 10
-          },
-          {
-            text: 'Connect with close friends only',
-            emoji: '🕯️',
-            traits: [AVATAR_TRAITS[17]], // Introverted
-            points: 10
-          },
-          {
-            text: 'Build communities and lead discussions',
-            emoji: '👑',
-            traits: [AVATAR_TRAITS[18]], // Leader
-            points: 10
-          },
-          {
-            text: 'Stay updated and informed',
-            emoji: '📱',
-            traits: [AVATAR_TRAITS[6]], // Tech-Savvy
-            points: 10
-          }
-        ]
-      },
-      {
-        id: 'q2',
-        text: 'Your ideal weekend involves...',
-        category: 'interests',
-        options: [
-          {
-            text: 'Gaming with friends',
-            emoji: '🎮',
-            traits: [AVATAR_TRAITS[11]], // Gamer
-            points: 10
-          },
-          {
-            text: 'Exploring new music',
-            emoji: '🎵',
-            traits: [AVATAR_TRAITS[8]], // Music-Enthusiast
-            points: 10
-          },
-          {
-            text: 'Outdoor adventures',
-            emoji: '🌿',
-            traits: [AVATAR_TRAITS[7]], // Nature-Lover
-            points: 10
-          },
-          {
-            text: 'Trying new restaurants',
-            emoji: '🍕',
-            traits: [AVATAR_TRAITS[10]], // Foodie
-            points: 10
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'career-compass',
-    title: 'Career Compass',
-    description: 'Discover your professional strengths and ideal work environment!',
-    emoji: '🧭',
-    category: 'career',
-    xpReward: 120,
+    id: "product-preferences",
+    title: "Product Preferences Survey",
+    description: "Help us understand your product preferences and shopping habits to improve our recommendations.",
+    category: "consumer",
+    emoji: "🛍️",
     estimatedTime: 5,
+    xpReward: 150,
     questions: [
       {
-        id: 'c1',
-        text: 'In a team project, which role do you naturally take on?',
-        category: 'social',
+        id: "purchaseFrequency",
+        text: "How often do you purchase new products in this category?",
         options: [
-          {
-            text: 'Taking charge and delegating tasks',
-            emoji: '👑',
-            traits: [AVATAR_TRAITS[18]], // Leader
-            points: 15
-          },
-          {
-            text: 'Contributing ideas and creative solutions',
-            emoji: '💡',
-            traits: [AVATAR_TRAITS[0]], // Creative
-            points: 15
-          },
-          {
-            text: 'Analyzing data and solving problems',
-            emoji: '📊',
-            traits: [AVATAR_TRAITS[1]], // Analytical
-            points: 15
-          },
-          {
-            text: 'Supporting team members and maintaining harmony',
-            emoji: '🤝',
-            traits: [AVATAR_TRAITS[19]], // Collaborator
-            points: 15
-          }
+          { text: "Every 1-2 years", emoji: "📅" },
+          { text: "When new model releases", emoji: "🆕" },
+          { text: "Every 3-4 years", emoji: "⏳" },
+          { text: "Only when necessary", emoji: "✨" }
         ]
       },
       {
-        id: 'c2',
-        text: 'What energizes you most at work?',
-        category: 'personality',
+        id: "decisionFactors",
+        text: "What's your primary factor in purchase decisions?",
         options: [
-          {
-            text: 'Learning new technologies and tools',
-            emoji: '💻',
-            traits: [AVATAR_TRAITS[6]], // Tech-Savvy
-            points: 15
-          },
-          {
-            text: 'Setting and achieving ambitious goals',
-            emoji: '🎯',
-            traits: [AVATAR_TRAITS[13]], // Ambitious
-            points: 15
-          },
-          {
-            text: 'Coming up with innovative solutions',
-            emoji: '🚀',
-            traits: [AVATAR_TRAITS[15]], // Innovative
-            points: 15
-          },
-          {
-            text: 'Building meaningful relationships',
-            emoji: '💝',
-            traits: [AVATAR_TRAITS[5]], // Caring
-            points: 15
-          }
+          { text: "Features and specifications", emoji: "📋" },
+          { text: "Brand reputation", emoji: "⭐" },
+          { text: "Price to performance ratio", emoji: "💰" },
+          { text: "User reviews", emoji: "👥" }
         ]
       },
       {
-        id: 'c3',
-        text: 'How do you prefer to work?',
-        category: 'personality',
+        id: "priceRange",
+        text: "Which price segment do you typically shop in?",
         options: [
-          {
-            text: 'In a fast-paced, dynamic environment',
-            emoji: '⚡',
-            traits: [AVATAR_TRAITS[2]], // Energetic
-            points: 15
-          },
-          {
-            text: 'In a quiet, focused space',
-            emoji: '🧘',
-            traits: [AVATAR_TRAITS[3]], // Calm
-            points: 15
-          },
-          {
-            text: 'With a mix of collaboration and solo work',
-            emoji: '⚖️',
-            traits: [AVATAR_TRAITS[14]], // Balanced
-            points: 15
-          },
-          {
-            text: 'In an environment that encourages experimentation',
-            emoji: '🔬',
-            traits: [AVATAR_TRAITS[4]], // Adventurous
-            points: 15
-          }
+          { text: "Premium segment", emoji: "👑" },
+          { text: "High-end", emoji: "💎" },
+          { text: "Mid-range", emoji: "⚖️" },
+          { text: "Budget", emoji: "💡" }
         ]
       },
       {
-        id: 'c4',
-        text: "What's your approach to professional growth?",
-        category: 'values',
+        id: "researchHabits",
+        text: "How do you research products before purchasing?",
         options: [
-          {
-            text: 'Constantly seeking new challenges',
-            emoji: '📈',
-            traits: [AVATAR_TRAITS[13]], // Ambitious
-            points: 15
-          },
-          {
-            text: 'Developing deep expertise in your field',
-            emoji: '📚',
-            traits: [AVATAR_TRAITS[1]], // Analytical
-            points: 15
-          },
-          {
-            text: 'Building a strong professional network',
-            emoji: '🌐',
-            traits: [AVATAR_TRAITS[16]], // Extroverted
-            points: 15
-          },
-          {
-            text: 'Finding work-life balance',
-            emoji: '🎭',
-            traits: [AVATAR_TRAITS[14]], // Balanced
-            points: 15
-          }
+          { text: "Detailed research", emoji: "🔍" },
+          { text: "Reviews and recommendations", emoji: "📱" },
+          { text: "Price comparisons", emoji: "📊" },
+          { text: "Quick overview", emoji: "👀" }
         ]
       },
       {
-        id: 'c5',
-        text: 'When facing a work challenge, you typically:',
-        category: 'personality',
+        id: "brandLoyalty",
+        text: "How would you describe your brand loyalty?",
         options: [
-          {
-            text: 'Break it down into smaller tasks',
-            emoji: '📋',
-            traits: [AVATAR_TRAITS[1]], // Analytical
-            points: 15
-          },
-          {
-            text: 'Brainstorm creative solutions',
-            emoji: '🎨',
-            traits: [AVATAR_TRAITS[0]], // Creative
-            points: 15
-          },
-          {
-            text: 'Seek advice from colleagues',
-            emoji: '💭',
-            traits: [AVATAR_TRAITS[19]], // Collaborator
-            points: 15
-          },
-          {
-            text: 'Trust your experience and intuition',
-            emoji: '✨',
-            traits: [AVATAR_TRAITS[12]], // Authentic
-            points: 15
-          }
+          { text: "Somewhat loyal", emoji: "🤝" },
+          { text: "Very loyal", emoji: "❤️" },
+          { text: "Not loyal", emoji: "🔄" },
+          { text: "Depends on product", emoji: "🤔" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "product-satisfaction",
+    title: "Product Satisfaction Survey",
+    description: "Share your experience with our products to help us improve and better serve your needs.",
+    category: "feedback",
+    emoji: "⭐",
+    estimatedTime: 7,
+    xpReward: 200,
+    questions: [
+      {
+        id: "usageFrequency",
+        text: "How often do you use our product?",
+        options: [
+          { text: "Daily", emoji: "📅" },
+          { text: "Several times a week", emoji: "🗓️" },
+          { text: "Weekly", emoji: "📆" },
+          { text: "Occasionally", emoji: "⌚" }
+        ]
+      },
+      {
+        id: "satisfactionLevel",
+        text: "How satisfied are you with the product quality?",
+        options: [
+          { text: "Very satisfied", emoji: "😍" },
+          { text: "Satisfied", emoji: "😊" },
+          { text: "Neutral", emoji: "😐" },
+          { text: "Dissatisfied", emoji: "😕" }
+        ]
+      },
+      {
+        id: "featureUsage",
+        text: "Which features do you use most frequently?",
+        options: [
+          { text: "Core features", emoji: "⚡" },
+          { text: "Advanced features", emoji: "🚀" },
+          { text: "Integration features", emoji: "🔄" },
+          { text: "Customization options", emoji: "🎨" }
+        ]
+      },
+      {
+        id: "improvements",
+        text: "What aspect of the product needs most improvement?",
+        options: [
+          { text: "Performance", emoji: "⚡" },
+          { text: "User interface", emoji: "🖥️" },
+          { text: "Features", emoji: "✨" },
+          { text: "Reliability", emoji: "🛡️" }
+        ]
+      },
+      {
+        id: "recommendation",
+        text: "How likely are you to recommend our product?",
+        options: [
+          { text: "Very likely", emoji: "🌟" },
+          { text: "Likely", emoji: "👍" },
+          { text: "Unlikely", emoji: "👎" },
+          { text: "Not at all", emoji: "❌" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "feature-requests",
+    title: "Feature Request Survey",
+    description: "Tell us what features you'd like to see in our future product releases.",
+    category: "feature",
+    emoji: "💡",
+    estimatedTime: 6,
+    xpReward: 180,
+    questions: [
+      {
+        id: "missingFeatures",
+        text: "What features do you wish our product had?",
+        options: [
+          { text: "Advanced analytics", emoji: "📊" },
+          { text: "Better integrations", emoji: "🔄" },
+          { text: "More customization", emoji: "🎨" },
+          { text: "Improved automation", emoji: "🤖" }
+        ]
+      },
+      {
+        id: "competitorFeatures",
+        text: "Which competitor features do you admire?",
+        options: [
+          { text: "User interface", emoji: "🖥️" },
+          { text: "Performance", emoji: "⚡" },
+          { text: "Unique features", emoji: "✨" },
+          { text: "Price point", emoji: "💰" }
+        ]
+      },
+      {
+        id: "priorityFeatures",
+        text: "What type of features should we prioritize?",
+        options: [
+          { text: "Productivity features", emoji: "⚡" },
+          { text: "Integration capabilities", emoji: "🔄" },
+          { text: "User experience", emoji: "👥" },
+          { text: "Performance optimization", emoji: "🚀" }
+        ]
+      },
+      {
+        id: "usageScenarios",
+        text: "In what scenarios do you use our product most?",
+        options: [
+          { text: "Professional work", emoji: "💼" },
+          { text: "Personal projects", emoji: "🏠" },
+          { text: "Team collaboration", emoji: "👥" },
+          { text: "Learning/Education", emoji: "📚" }
+        ]
+      },
+      {
+        id: "futureNeeds",
+        text: "What future needs should our product address?",
+        options: [
+          { text: "Mobile capabilities", emoji: "📱" },
+          { text: "Cloud integration", emoji: "☁️" },
+          { text: "AI/ML features", emoji: "🤖" },
+          { text: "Security enhancements", emoji: "🔒" }
         ]
       }
     ]
@@ -386,9 +226,9 @@ export function generateAvatar(selectedTraits: AvatarTrait[]): Avatar {
   const valueTraits = selectedTraits.filter(t => t.category === 'values');
   const socialTraits = selectedTraits.filter(t => t.category === 'social');
 
-  // Generate personality description
-  const primaryTrait = personalityTraits[0] || selectedTraits[0];
-  const secondaryTrait = interestTraits[0] || valueTraits[0] || socialTraits[0];
+  // Generate personality description with fallbacks
+  const primaryTrait = personalityTraits[0] || selectedTraits[0] || { name: 'Unique', emoji: '✨', category: 'personality', strength: 5 };
+  const secondaryTrait = interestTraits[0] || valueTraits[0] || socialTraits[0] || { name: 'Individual', emoji: '🌟', category: 'interests', strength: 5 };
   
   const personality = `${primaryTrait.name} ${secondaryTrait.name}`;
   
@@ -406,23 +246,22 @@ export function generateAvatar(selectedTraits: AvatarTrait[]): Avatar {
     title = 'The Unique Individual';
   }
 
-  // Generate description
+  // Generate description with fallback
   const descriptions = [
     `A ${primaryTrait.name.toLowerCase()} soul with a passion for ${secondaryTrait.name.toLowerCase()} experiences.`,
     `Balancing ${primaryTrait.name.toLowerCase()} energy with ${secondaryTrait.name.toLowerCase()} wisdom.`,
     `Where ${primaryTrait.name.toLowerCase()} meets ${secondaryTrait.name.toLowerCase()} in perfect harmony.`,
     `A ${primaryTrait.name.toLowerCase()} spirit exploring the world through ${secondaryTrait.name.toLowerCase()} eyes.`
   ];
-  
-  const description = descriptions[Math.floor(Math.random() * descriptions.length)];
 
   return {
     traits: selectedTraits,
     personality,
-    voiceId: '21m00Tcm4TlvDq8ikWAM', // Rachel voice
+    voiceId: 'default',
     visualStyle: 'emoji',
     title,
-    description
+    description: descriptions[Math.floor(Math.random() * descriptions.length)],
+    characterDescription: `A ${primaryTrait.name.toLowerCase()} individual with ${secondaryTrait.name.toLowerCase()} tendencies.`
   };
 }
 
