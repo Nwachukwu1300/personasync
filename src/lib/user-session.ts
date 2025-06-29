@@ -11,6 +11,7 @@ interface UserProfile {
   profileVisibility: 'public' | 'private';
   xp: number;
   createdAt: string;
+  completedSurveys?: string[]; // Track completed survey IDs
 }
 
 export class UserSession {
@@ -62,6 +63,36 @@ export class UserSession {
     currentUser.xp = xpAmount;
     this.saveUser(currentUser);
     return true;
+  }
+
+  // Complete a survey and add XP (prevents duplicate completions)
+  static completeSurvey(surveyId: string, xpAmount: number): { success: boolean; alreadyCompleted: boolean; xpEarned: number } {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) return { success: false, alreadyCompleted: false, xpEarned: 0 };
+
+    // Initialize completedSurveys array if it doesn't exist
+    if (!currentUser.completedSurveys) {
+      currentUser.completedSurveys = [];
+    }
+
+    // Check if survey already completed
+    if (currentUser.completedSurveys.includes(surveyId)) {
+      return { success: true, alreadyCompleted: true, xpEarned: 0 };
+    }
+
+    // Add survey to completed list and award XP
+    currentUser.completedSurveys.push(surveyId);
+    currentUser.xp += xpAmount;
+    this.saveUser(currentUser);
+
+    return { success: true, alreadyCompleted: false, xpEarned: xpAmount };
+  }
+
+  // Check if user has completed a survey
+  static hasSurveyCompleted(surveyId: string): boolean {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser || !currentUser.completedSurveys) return false;
+    return currentUser.completedSurveys.includes(surveyId);
   }
 
   // Logout (clear current user)

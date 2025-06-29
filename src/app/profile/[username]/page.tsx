@@ -9,7 +9,6 @@ import {
   User, 
   Calendar, 
   Trophy, 
-  Target, 
   Users, 
   Zap, 
   Star,
@@ -21,6 +20,8 @@ import {
   Sparkles
 } from "lucide-react";
 import Link from "next/link";
+import { COMMUNITIES } from '@/lib/rewards';
+import mockUsers from '@/lib/mock-users';
 
 interface UserProfile {
   firstName: string;
@@ -46,21 +47,33 @@ interface ProfilePageProps {
   }>;
 }
 
-// Emoji mappings for personality goals
-const GOAL_EMOJIS: Record<string, string> = {
-  'improve-confidence': '💪',
-  'better-communication': '🗣️',
-  'emotional-intelligence': '❤️',
-  'leadership-skills': '👑',
-  'stress-management': '🧘',
-  'social-skills': '🤝',
-  'self-awareness': '🔍',
-  'empathy': '🤗',
-  'decision-making': '⚖️',
-  'creativity': '🎨',
-  'time-management': '⏰',
-  'public-speaking': '🎤'
+// Map personality types from mock data to community IDs
+const PERSONALITY_TO_COMMUNITY: Record<string, string> = {
+  'Creative Owl': 'creative-visionaries',
+  'Chill Explorer': 'peaceful-sages',
+  'Bold Visionary': 'dynamic-forces',
+  'Focused Strategist': 'strategic-thinkers',
+  'Social Spark': 'social-leaders',
+  'Tech Enthusiast': 'tech-enthusiasts',
+  'Nature Connector': 'nature-connectors',
+  'Collaborative Spirit': 'collaborative-spirits'
 };
+
+// Function to get user's community based on personality type
+function getUserCommunity(username: string) {
+  // Find user in mock data by username
+  const mockUser = mockUsers.find(user => 
+    user.name.toLowerCase().replace(' ', '') === username.toLowerCase() ||
+    user.email.split('@')[0] === username.toLowerCase()
+  );
+  
+  if (mockUser && mockUser.personalityType) {
+    const communityId = PERSONALITY_TO_COMMUNITY[mockUser.personalityType];
+    return COMMUNITIES.find(community => community.id === communityId);
+  }
+  
+  return null;
+}
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { username } = await params;
@@ -184,7 +197,7 @@ function ProfileContent({ username }: { username: string }) {
         </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -234,90 +247,87 @@ function ProfileContent({ username }: { username: string }) {
             </Card>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600">Surveys</p>
-                    <p className="text-2xl font-bold text-green-600">0</p>
-                  </div>
-                  <Target className="w-8 h-8 text-green-500" />
-                </div>
-                <div className="mt-4">
-                  <p className="text-xs text-gray-500">Ready to start your first survey?</p>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+
         </div>
 
-        {/* Personality Goals Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mb-8"
-        >
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center">
-                <Target className="w-5 h-5 mr-2 text-blue-500" />
-                Personality Goals
-              </h3>
-              {user.personalityGoals.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {user.personalityGoals.map((goal) => (
-                    <span
-                      key={goal}
-                      className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm flex items-center"
-                    >
-                      <span className="mr-1">{GOAL_EMOJIS[goal] || '🎯'}</span>
-                      {goal.charAt(0).toUpperCase() + goal.slice(1).replace('-', ' ')}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500">No goals set yet</p>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
 
-        {/* Get Started Section */}
+
+        {/* Community Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-4 flex items-center">
-                <Sparkles className="w-5 h-5 mr-2 text-purple-500" />
-                Ready to Discover Your Personality?
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Take your first voice-powered personality survey to unlock your unique avatar and start earning XP!
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Link href="/surveys">
-                  <Button className="bg-purple-600 hover:bg-purple-700">
-                    <Target className="w-4 h-4 mr-2" />
-                    Take First Survey
-                  </Button>
-                </Link>
-                <Link href="/onboarding">
-                  <Button variant="outline">
-                    Learn More
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+          {(() => {
+            const userCommunity = getUserCommunity(username);
+            if (userCommunity) {
+              return (
+                <Card>
+                  <CardContent className="p-6">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center">
+                      <Users className="w-5 h-5 mr-2 text-purple-500" />
+                      Your Community
+                    </h3>
+                    <div className={`p-6 rounded-lg bg-gradient-to-r ${userCommunity.color} text-white mb-4`}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="flex items-center mb-2">
+                            <span className="text-3xl mr-3">{userCommunity.emoji}</span>
+                            <h4 className="text-xl font-bold">{userCommunity.name}</h4>
+                          </div>
+                          <p className="text-white/90 mb-3">{userCommunity.description}</p>
+                          <div className="flex items-center text-sm text-white/80">
+                            <Users className="w-4 h-4 mr-1" />
+                            <span>{userCommunity.memberCount.toLocaleString()} members</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {userCommunity.traits.map((trait) => (
+                        <span
+                          key={trait}
+                          className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm"
+                        >
+                          {trait}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Link href="/communities">
+                        <Button className="bg-purple-600 hover:bg-purple-700">
+                          <Users className="w-4 h-4 mr-2" />
+                          Explore Communities
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            } else {
+              return (
+                <Card>
+                  <CardContent className="p-6">
+                    <h3 className="text-lg font-semibold mb-4 flex items-center">
+                      <Users className="w-5 h-5 mr-2 text-purple-500" />
+                      Discover Your Community
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      Explore our vibrant personality-based communities and find where you belong!
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Link href="/communities">
+                        <Button className="bg-purple-600 hover:bg-purple-700">
+                          <Users className="w-4 h-4 mr-2" />
+                          Explore Communities
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            }
+          })()}
         </motion.div>
       </div>
     </div>
