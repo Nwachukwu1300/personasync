@@ -1,16 +1,24 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { VoiceAgent, SurveyData } from '../../../../lib/voice-agent';
 import { SURVEYS } from '../../../../lib/surveys';
-import { generateAvatar, calculateXP } from '../../../../lib/surveys';
+import { generateAvatar } from '../../../../lib/surveys';
 import { UserSession } from '../../../../lib/user-session';
 import { Play, Pause, Send, Volume2, ArrowLeft, Mic, MicOff } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Extend Window interface for Speech Recognition
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
 
 interface ConversationMessage {
   role: 'user' | 'assistant';
@@ -32,7 +40,13 @@ export default function VoiceSurveyPage() {
   const [hasStarted, setHasStarted] = useState(false);
   const [earnedXP, setEarnedXP] = useState(0);
   const [avatar, setAvatar] = useState<any>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(false);
+  const [currentTranscript, setCurrentTranscript] = useState('');
+  const [completedTranscript, setCompletedTranscript] = useState('');
   const audioRef = useRef<HTMLAudioElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   // Find the current survey
   const survey = SURVEYS.find(s => s.id === params.id);
@@ -44,6 +58,157 @@ export default function VoiceSurveyPage() {
       setVoiceAgent(agent);
     }
   }, [survey, voiceAgent]);
+
+  // Stable function for sending messages
+  const sendMessageWithText = useCallback(async (message: string) => {
+    console.log('sendMessageWithText called with:', message);
+    if (!message.trim() || !voiceAgent || isLoading) {
+      console.log('Skipping message send - conditions not met:', {
+        hasMessage: !!message.trim(),
+        hasVoiceAgent: !!voiceAgent,
+        isLoading
+      });
+      return;
+    }
+
+    const userMessage = message.trim();
+    console.log('Processing message:', userMessage);
+    setIsLoading(true);
+
+    // Add user message to conversation (for tracking, but won't display text)
+    const newConversation = [...conversation, {
+      role: 'user' as const,
+      content: userMessage,
+      timestamp: new Date()
+    }];
+    setConversation(newConversation);
+
+    try {
+      const response = await voiceAgent.processResponse(userMessage);
+      
+      // Add assistant response to conversation
+      const updatedConversation = [...newConversation, {
+        role: 'assistant' as const,
+        content: response.reply,
+        timestamp: new Date()
+      }];
+      setConversation(updatedConversation);
+
+      // Update survey data
+      setSurveyData(response.surveyData);
+
+      // Generate and play voice response
+      const audioUrl = await voiceAgent.generateVoice(response.reply);
+      setCurrentAudio(audioUrl);
+      
+      // Auto-play the response
+      setTimeout(() => {
+        playAudio(audioUrl);
+      }, 500);
+
+      // Check if survey is complete
+      if (response.isComplete) {
+        handleSurveyComplete(response.surveyData);
+      }
+
+    } catch (error) {
+      console.error('Error processing response:', error);
+      // Add error message to conversation
+      setConversation(prev => [...prev, {
+        role: 'assistant',
+        content: "Sorry, I had trouble understanding that. Could you try again?",
+        timestamp: new Date()
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [voiceAgent, isLoading, conversation]);
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      
+      if (SpeechRecognition) {
+        setSpeechSupported(true);
+        const recognition = new SpeechRecognition();
+        
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+        recognition.maxAlternatives = 1;
+
+        let fullTranscript = '';
+
+        recognition.onstart = () => {
+          setIsListening(true);
+          setIsRecording(true);
+          setCurrentTranscript('');
+          fullTranscript = '';
+        };
+
+        recognition.onresult = (event: any) => {
+          let interimTranscript = '';
+          let finalTranscript = '';
+          
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript + ' ';
+            } else {
+              interimTranscript += transcript;
+            }
+          }
+
+          // Update the full transcript with final results
+          if (finalTranscript) {
+            fullTranscript += finalTranscript;
+          }
+
+          // Update visual feedback with current transcript (final + interim)
+          setCurrentTranscript(fullTranscript + interimTranscript);
+        };
+
+        recognition.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error);
+          setIsListening(false);
+          setIsRecording(false);
+          setCurrentTranscript('');
+        };
+
+        recognition.onend = () => {
+          setIsListening(false);
+          setIsRecording(false);
+          
+          // Store the completed transcript in state for processing
+          if (fullTranscript.trim()) {
+            console.log('Speech ended, transcript:', fullTranscript.trim());
+            setCompletedTranscript(fullTranscript.trim());
+          } else {
+            console.log('No transcript captured');
+          }
+          
+          setCurrentTranscript('');
+          fullTranscript = '';
+        };
+
+        recognitionRef.current = recognition;
+      } else {
+        setSpeechSupported(false);
+        console.warn('Speech recognition not supported in this browser');
+      }
+    }
+  }, []);
+
+  // Handle completed transcript (send message when speech ends)
+  useEffect(() => {
+    if (completedTranscript && voiceAgent && !isLoading) {
+      console.log('Processing completed transcript:', completedTranscript);
+      setUserInput(completedTranscript);
+      sendMessageWithText(completedTranscript);
+      setCompletedTranscript(''); // Clear after sending
+    }
+  }, [completedTranscript, voiceAgent, isLoading, sendMessageWithText]);
 
   // Handle invalid survey ID
   if (!survey) {
@@ -97,71 +262,23 @@ export default function VoiceSurveyPage() {
     }
   };
 
+
+
   const sendMessage = async () => {
     if (!userInput.trim() || !voiceAgent || isLoading) return;
-
-    const userMessage = userInput.trim();
+    await sendMessageWithText(userInput);
     setUserInput('');
-    setIsLoading(true);
-
-    // Add user message to conversation
-    const newConversation = [...conversation, {
-      role: 'user' as const,
-      content: userMessage,
-      timestamp: new Date()
-    }];
-    setConversation(newConversation);
-
-    try {
-      const response = await voiceAgent.processResponse(userMessage);
-      
-      // Add assistant response to conversation
-      const updatedConversation = [...newConversation, {
-        role: 'assistant' as const,
-        content: response.reply,
-        timestamp: new Date()
-      }];
-      setConversation(updatedConversation);
-
-      // Update survey data
-      setSurveyData(response.surveyData);
-
-      // Generate and play voice response
-      const audioUrl = await voiceAgent.generateVoice(response.reply);
-      setCurrentAudio(audioUrl);
-      
-      // Auto-play the response
-      setTimeout(() => {
-        playAudio(audioUrl);
-      }, 500);
-
-      // Check if survey is complete
-      if (response.isComplete) {
-        handleSurveyComplete(response.surveyData);
-      }
-
-    } catch (error) {
-      console.error('Error processing response:', error);
-      // Add error message to conversation
-      setConversation(prev => [...prev, {
-        role: 'assistant',
-        content: "Sorry, I had trouble understanding that. Could you try again?",
-        timestamp: new Date()
-      }]);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleSurveyComplete = (finalSurveyData: SurveyData) => {
     // Generate avatar from survey data (convert to traits)
     const traits = Object.values(finalSurveyData).map(value => 
       // Simple mapping - in real app, this would be more sophisticated
-      ({ name: String(value), emoji: '✨', description: '', category: 'personality', strength: 7 })
+      ({ name: String(value), emoji: '✨', description: '', category: 'personality' as const, strength: 7 })
     );
     
     const generatedAvatar = generateAvatar(traits);
-    const xp = calculateXP(survey, Object.values(finalSurveyData).map(String));
+    const xp = survey.xpReward; // Use the survey's predefined XP reward
     
     // Save to user session
     let earnedXP = xp;
@@ -191,6 +308,22 @@ export default function VoiceSurveyPage() {
         audioRef.current.play();
       }
       setIsPlaying(!isPlaying);
+    }
+  };
+
+  const startVoiceRecording = () => {
+    if (recognitionRef.current && speechSupported && !isRecording) {
+      try {
+        recognitionRef.current.start();
+      } catch (error) {
+        console.error('Error starting voice recording:', error);
+      }
+    }
+  };
+
+  const stopVoiceRecording = () => {
+    if (recognitionRef.current && isRecording) {
+      recognitionRef.current.stop();
     }
   };
 
@@ -318,8 +451,15 @@ export default function VoiceSurveyPage() {
                   Ready to Chat with Nova? 
                 </h2>
                 <p className="text-gray-600 mb-6">
-                  I'm going to ask about your day and then we'll have a natural conversation about {survey.title.toLowerCase()}. It'll be fun! 
+                  This is a voice-only conversation! I'll ask about your day and we'll chat naturally about {survey.title.toLowerCase()}. Tap the microphone to start speaking, then tap it again when you're done! 
                 </p>
+                {!speechSupported && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                    <p className="text-sm text-yellow-700">
+                      Voice input not supported in this browser. You can still type responses.
+                    </p>
+                  </div>
+                )}
                 <Button
                   onClick={startConversation}
                   disabled={isLoading}
@@ -333,68 +473,109 @@ export default function VoiceSurveyPage() {
         ) : (
           /* Chat Interface */
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Conversation */}
+            {/* Voice Interface */}
             <div className="lg:col-span-2">
               <Card className="border-0 shadow-2xl bg-white/90 backdrop-blur-sm rounded-3xl">
-                <CardContent className="p-6">
-                  <div className="h-96 overflow-y-auto mb-6 space-y-4">
-                    <AnimatePresence>
-                      {conversation.map((message, index) => (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                        >
-                          <div className={`max-w-[80%] p-4 rounded-2xl ${
-                            message.role === 'user'
-                              ? 'bg-purple-500 text-white'
-                              : 'bg-gray-100 text-gray-900'
-                          }`}>
-                            <p className="text-sm font-medium mb-1">
-                              {message.role === 'user' ? 'You' : 'Nova'}
-                            </p>
-                            <p>{message.content}</p>
-                            <p className="text-xs opacity-70 mt-2">
-                              {message.timestamp.toLocaleTimeString()}
-                            </p>
+                <CardContent className="p-8">
+                  <div className="text-center">
+                    <div className="mb-8">
+                      <div className="w-32 h-32 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-6 relative">
+                        {isPlaying ? (
+                          <Volume2 className="w-16 h-16 text-white animate-pulse" />
+                        ) : isListening ? (
+                          <div className="relative">
+                            <Mic className="w-16 h-16 text-white" />
+                            <div className="absolute inset-0 bg-white/20 rounded-full animate-ping"></div>
                           </div>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-                    {isLoading && (
-                      <div className="flex justify-start">
-                        <div className="bg-gray-100 p-4 rounded-2xl">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                            <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                          </div>
-                        </div>
+                        ) : (
+                          <span className="text-4xl">{survey.emoji}</span>
+                        )}
                       </div>
-                    )}
-                  </div>
-
-                  {/* Input Area */}
-                  <div className="flex gap-3">
-                    <div className="flex-1 relative">
-                      <textarea
-                        value={userInput}
-                        onChange={(e) => setUserInput(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        placeholder="Type your response..."
-                        className="w-full p-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
-                        rows={2}
-                        disabled={isLoading}
-                      />
+                      
+                      <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                        {isLoading ? 'Nova is thinking...' : 
+                         isListening ? 'Listening...' : 
+                         isPlaying ? 'Nova is speaking' : 
+                         'Ready to chat with Nova'}
+                      </h2>
+                      
+                      <p className="text-gray-600">
+                        {isLoading ? 'Processing your response' : 
+                         isListening ? 'Speak now, tap mic again when done!' : 
+                         isPlaying ? 'Listen to Nova\'s response' : 
+                         'Tap the microphone to start speaking'}
+                      </p>
+                      
+                      {/* Real-time transcript display */}
+                      {isListening && currentTranscript && (
+                        <div className="mt-4 p-4 bg-purple-50 rounded-2xl border-2 border-purple-200">
+                          <p className="text-sm text-purple-600 font-medium mb-1">What I'm hearing:</p>
+                          <p className="text-purple-800 italic">{currentTranscript}</p>
+                        </div>
+                      )}
                     </div>
-                    <Button
-                      onClick={sendMessage}
-                      disabled={!userInput.trim() || isLoading}
-                      className="bg-purple-500 hover:bg-purple-600 text-white p-4 rounded-2xl"
-                    >
-                      <Send className="w-5 h-5" />
-                    </Button>
+
+                    {/* Voice Controls */}
+                    <div className="flex justify-center gap-4 mb-8">
+                      {speechSupported ? (
+                        <div className="text-center">
+                          <Button
+                            onClick={isRecording ? stopVoiceRecording : startVoiceRecording}
+                            disabled={isLoading || isPlaying}
+                            className={`w-20 h-20 rounded-full text-white font-semibold transition-all ${
+                              isRecording 
+                                ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
+                                : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
+                            }`}
+                          >
+                            {isRecording ? <MicOff className="w-8 h-8" /> : <Mic className="w-8 h-8" />}
+                          </Button>
+                          <p className="text-xs text-gray-500 mt-2">
+                            {isRecording ? 'Tap to stop recording' : 'Tap to start recording'}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4 w-full max-w-md">
+                          <textarea
+                            value={userInput}
+                            onChange={(e) => setUserInput(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            placeholder="Voice not supported. Type your response..."
+                            className="w-full p-4 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                            rows={3}
+                            disabled={isLoading}
+                          />
+                          <Button
+                            onClick={sendMessage}
+                            disabled={!userInput.trim() || isLoading}
+                            className="w-full bg-purple-500 hover:bg-purple-600 text-white"
+                          >
+                            <Send className="w-4 h-4 mr-2" />
+                            Send Response
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Audio Controls */}
+                    <div className="flex justify-center">
+                      <Button
+                        onClick={togglePlayPause}
+                        disabled={!currentAudio}
+                        variant="outline"
+                        className="flex items-center gap-2"
+                      >
+                        {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                        {isPlaying ? 'Pause Nova' : 'Replay Last Message'}
+                      </Button>
+                    </div>
+
+                    <audio
+                      ref={audioRef}
+                      onPlay={() => setIsPlaying(true)}
+                      onPause={() => setIsPlaying(false)}
+                      onEnded={() => setIsPlaying(false)}
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -402,28 +583,41 @@ export default function VoiceSurveyPage() {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Audio Controls */}
+              {/* Voice Status */}
               <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm rounded-3xl">
                 <CardContent className="p-6">
                   <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Volume2 className="w-5 h-5" />
-                    Nova's Voice
+                    <Mic className="w-5 h-5" />
+                    Voice Status
                   </h3>
                   <div className="space-y-3">
-                    <Button
-                      onClick={togglePlayPause}
-                      disabled={!currentAudio}
-                      className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-                    >
-                      {isPlaying ? <Pause className="w-4 h-4 mr-2" /> : <Play className="w-4 h-4 mr-2" />}
-                      {isPlaying ? 'Pause' : 'Play Last Message'}
-                    </Button>
-                    <audio
-                      ref={audioRef}
-                      onPlay={() => setIsPlaying(true)}
-                      onPause={() => setIsPlaying(false)}
-                      onEnded={() => setIsPlaying(false)}
-                    />
+                    <div className={`flex items-center gap-2 p-3 rounded-lg ${
+                      speechSupported 
+                        ? 'bg-green-50 text-green-700' 
+                        : 'bg-yellow-50 text-yellow-700'
+                    }`}>
+                      <div className={`w-2 h-2 rounded-full ${
+                        speechSupported ? 'bg-green-500' : 'bg-yellow-500'
+                      }`}></div>
+                      <span className="text-sm font-medium">
+                        {speechSupported ? 'Voice input ready' : 'Voice not supported'}
+                      </span>
+                    </div>
+                    
+                    {isListening && (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 p-3 rounded-lg bg-purple-50 text-purple-700">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                          <span className="text-sm font-medium">Listening... (tap mic to stop)</span>
+                        </div>
+                        {currentTranscript && (
+                          <div className="p-2 bg-gray-50 rounded text-xs text-gray-600 max-h-16 overflow-y-auto">
+                            <div className="font-medium mb-1">Current:</div>
+                            <div className="italic">{currentTranscript}</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
