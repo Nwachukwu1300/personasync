@@ -263,7 +263,7 @@ export default function DashboardPage() {
                     <Line type="monotone" dataKey="completion" stroke="#db2777" />
                   </LineChart>
                 </ResponsiveContainer>
-              </div>
+                </div>
             </CardContent>
           </Card>
         </div>

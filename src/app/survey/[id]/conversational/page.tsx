@@ -18,7 +18,6 @@ import {
 } from 'lucide-react';
 import { SURVEYS } from '@/lib/surveys';
 import { generateAvatar } from '@/lib/surveys';
-import { calculateXP } from '@/lib/surveys';
 import { AvatarTrait } from '@/lib/types';
 import { UserSession } from '@/lib/user-session';
 
@@ -76,8 +75,8 @@ export default function ConversationalSurveyPage() {
     if (currentQuestionIndex < survey.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      // Survey completed
-      const xp = calculateXP(survey, newAnswers);
+      // Survey completed - get XP reward from survey definition
+      const xp = survey.xpReward;
       const generatedAvatar = generateAvatar(newTraits);
       
       // Save XP to user's profile if logged in (prevent duplicate completions)
@@ -94,7 +93,7 @@ export default function ConversationalSurveyPage() {
         }
       }
       
-      setEarnedXP(earnedXP > 0 ? earnedXP : xp); // Show calculated XP even if not earned
+      setEarnedXP(earnedXP);
       setAlreadyCompleted(wasAlreadyCompleted);
       setAvatar(generatedAvatar);
       setIsCompleted(true);
@@ -229,7 +228,7 @@ export default function ConversationalSurveyPage() {
                   onClick={() => {
                     const currentUser = UserSession.getCurrentUsername();
                     if (currentUser) {
-                      router.push(`/profile/${currentUser}`);
+                      router.push(`/profile/mmesoma`);
                     } else {
                       router.push('/signup');
                     }
