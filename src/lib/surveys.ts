@@ -263,20 +263,4 @@ export function generateAvatar(selectedTraits: AvatarTrait[]): Avatar {
     description: descriptions[Math.floor(Math.random() * descriptions.length)],
     characterDescription: `A ${primaryTrait.name.toLowerCase()} individual with ${secondaryTrait.name.toLowerCase()} tendencies.`
   };
-}
-
-// XP calculation
-export function calculateXP(survey: Survey, answers: string[]): number {
-  let baseXP = survey.xpReward;
-  let bonusXP = 0;
-  
-  // Bonus for completing quickly
-  bonusXP += 20;
-  
-  // Bonus for consistent answers
-  if (answers.length > 1) {
-    bonusXP += 10;
-  }
-  
-  return baseXP + bonusXP;
 } 

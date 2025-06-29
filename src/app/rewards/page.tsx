@@ -187,8 +187,11 @@ export default function RewardsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get current user data
+    // Get current user data and ensure XP is initialized
     const user = UserSession.getCurrentUser();
+    if (user && typeof user.xp === 'undefined') {
+      UserSession.setXP(0);
+    }
     setCurrentUser(user);
     setLoading(false);
   }, []);
@@ -204,7 +207,7 @@ export default function RewardsPage() {
     );
   }
 
-  if (!currentUser) {
+  if (!UserSession.isLoggedIn()) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center">
         <Card className="max-w-md mx-auto text-center">
@@ -234,11 +237,13 @@ export default function RewardsPage() {
     );
   }
 
-  const userXP = currentUser.xp;
+  // Initialize XP to 0 if undefined
+  const userXP = currentUser?.xp ?? 0;
   const currentLevel = Math.floor(userXP / 100) + 1;
   const xpInCurrentLevel = userXP % 100;
   const xpToNextLevel = 100 - xpInCurrentLevel;
 
+  // Filter rewards based on XP
   const eligibleRewards = REWARDS.filter(reward => userXP >= reward.xpRequired);
   const futureRewards = REWARDS.filter(reward => userXP < reward.xpRequired);
 

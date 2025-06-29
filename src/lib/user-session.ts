@@ -15,7 +15,7 @@ interface UserProfile {
 }
 
 export class UserSession {
-  private static CURRENT_USER_KEY = 'personasync_current_user';
+  private static CURRENT_USER_KEY = 'currentUser';
   private static USER_PREFIX = 'personasync_user_';
 
   // Set the current logged-in user
@@ -39,10 +39,24 @@ export class UserSession {
     return userData ? JSON.parse(userData) : null;
   }
 
-  // Save user data (for signup or updates)
-  static saveUser(userData: UserProfile): void {
-    const userKey = `${this.USER_PREFIX}${userData.username}`;
-    localStorage.setItem(userKey, JSON.stringify(userData));
+  // Save user data
+  private static saveUser(user: UserProfile): void {
+    localStorage.setItem(`${this.USER_PREFIX}${user.username}`, JSON.stringify(user));
+    localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(user));
+  }
+
+  // Create new user
+  static createUser(userData: Omit<UserProfile, 'xp' | 'createdAt' | 'completedSurveys'>): boolean {
+    const newUser: UserProfile = {
+      ...userData,
+      xp: 0, // Always start with 0 XP
+      createdAt: new Date().toISOString(),
+      completedSurveys: [], // Initialize empty completed surveys array
+      profileVisibility: 'public'
+    };
+
+    this.saveUser(newUser);
+    return true;
   }
 
   // Add XP to the current user

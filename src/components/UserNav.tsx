@@ -60,13 +60,6 @@ export default function UserNav() {
   
   return (
     <div className="flex items-center space-x-4">
-      {/* XP Display */}
-      <div className="hidden sm:flex items-center space-x-2 text-xs text-gray-500">
-        <span className="font-medium text-purple-600">Level {currentLevel}</span>
-        <span>•</span>
-        <span>{currentUser.xp} XP</span>
-      </div>
-      
       {/* Profile Link */}
       <Link 
         href={`/profile/${currentUser.username}`}
