@@ -35,10 +35,9 @@ export default function SurveysPage() {
 
   const categories = [
     { id: 'all', name: 'All Surveys', emoji: '🌟', count: SURVEYS.length },
-    { id: 'personality', name: 'Personality', emoji: '🧠', count: SURVEYS.filter(s => s.category === 'personality').length },
-    { id: 'lifestyle', name: 'Lifestyle', emoji: '💫', count: SURVEYS.filter(s => s.category === 'lifestyle').length },
-    { id: 'career', name: 'Career', emoji: '💼', count: SURVEYS.filter(s => s.category === 'career').length },
-    { id: 'social', name: 'Social', emoji: '🤝', count: SURVEYS.filter(s => s.category === 'social').length },
+    { id: 'consumer', name: 'Consumer', emoji: '🛍️', count: SURVEYS.filter(s => s.category === 'consumer').length },
+    { id: 'feedback', name: 'Feedback', emoji: '⭐', count: SURVEYS.filter(s => s.category === 'feedback').length },
+    { id: 'feature', name: 'Feature', emoji: '💡', count: SURVEYS.filter(s => s.category === 'feature').length },
   ];
 
   const filteredSurveys = SURVEYS.filter(survey => {
@@ -176,9 +175,9 @@ export default function SurveysPage() {
                   {/* Category Badge */}
                   <div className="mb-6">
                     <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                      survey.category === 'personality' ? 'bg-purple-100 text-purple-700' :
-                      survey.category === 'lifestyle' ? 'bg-pink-100 text-pink-700' :
-                      survey.category === 'career' ? 'bg-blue-100 text-blue-700' :
+                      survey.category === 'consumer' ? 'bg-purple-100 text-purple-700' :
+                      survey.category === 'feedback' ? 'bg-pink-100 text-pink-700' :
+                      survey.category === 'feature' ? 'bg-blue-100 text-blue-700' :
                       'bg-green-100 text-green-700'
                     }`}>
                       {survey.category.charAt(0).toUpperCase() + survey.category.slice(1)}
@@ -188,15 +187,15 @@ export default function SurveysPage() {
                   {/* CTA Button */}
                   {isCompleted ? (
                     <Button asChild className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 rounded-2xl shadow-lg">
-                      <Link href={`/survey/${survey.id}/conversational`} className="flex items-center justify-center gap-2">
+                      <Link href={`/survey/${survey.id}/voice`} className="flex items-center justify-center gap-2">
                         <CheckCircle2 className="w-4 h-4" />
-                        Retake Survey
+                        Chat Again with Nova
                       </Link>
                     </Button>
                   ) : (
                     <Button asChild className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 rounded-2xl shadow-lg transform hover:scale-105 transition-all">
-                      <Link href={`/survey/${survey.id}/conversational`} className="flex items-center justify-center gap-2">
-                        Start Survey
+                      <Link href={`/survey/${survey.id}/voice`} className="flex items-center justify-center gap-2">
+                        🎙️ Chat with Nova
                         <ArrowRight className="w-4 h-4" />
                       </Link>
                     </Button>
