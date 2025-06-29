@@ -36,7 +36,7 @@ export default function Home() {
                 PersonaSync
               </h1>
               <p className="text-2xl md:text-3xl text-gray-800 font-medium tracking-tight">
-                Discover Your True Self Through Voice-Powered Personality Surveys
+                Experience AI-Powered Personality Surveys Through Natural Conversation
               </p>
             </motion.div>
 
@@ -47,9 +47,9 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed"
             >
-              Join thousands of Gen Z users exploring their unique personality traits, 
-              creating digital avatars, and building meaningful connections through 
-              <span className="text-purple-600 font-semibold"> voice-powered self-discovery</span>.
+              Join our diverse community of users from across the globe, exploring their unique traits through 
+              <span className="text-purple-600 font-semibold"> natural voice conversations with Nova</span>. From Tokyo to London, 
+              San Francisco to Sydney.
             </motion.p>
 
             {/* Enhanced CTA Buttons */}

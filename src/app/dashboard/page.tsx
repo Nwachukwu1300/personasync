@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -36,7 +36,11 @@ import {
   Clock,
   Target,
   Award,
-  MapPin
+  MapPin,
+  Share,
+  Mic,
+  Pause,
+  Play
 } from 'lucide-react';
 import {
   surveyResponses,
@@ -44,10 +48,18 @@ import {
   personaRankings,
   questionAnalytics,
   insights,
-  dailyCompletions
+  dailyCompletions,
+  traitInsights
 } from '@/lib/mock-survey-data';
 import mockUsers from '@/lib/mock-users';
 import { generateBusinessReport, generateCSV } from '@/lib/export-utils';
+
+interface TraitInsight {
+  trait: string;
+  count: number;
+  description: string;
+  color: string;
+}
 
 // Calculate dashboard stats
 const dashboardStats = {
@@ -62,6 +74,9 @@ const COLORS = ['#9333ea', '#db2777', '#4f46e5', '#0891b2'];
 
 export default function DashboardPage() {
   const { toast } = useToast();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   // Calculate country distribution
   const countryDistribution = useMemo(() => {
@@ -120,39 +135,166 @@ export default function DashboardPage() {
     });
   };
 
-  // Handle share insights
-  const handleShareInsights = async () => {
-    const shareData = {
-      title: 'PersnaSync Insights',
-      text: 'Check out our latest survey insights!',
-      url: window.location.href
-    };
+  // Handle play/pause
+  const togglePlayPause = () => {
+    if (!audioRef.current) return;
+    
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
 
+  // Handle share insights button click
+  const handleShareInsights = async () => {
     try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-        toast({
-          title: "Shared Successfully",
-          description: "Insights have been shared",
-        });
-      } else {
-        await navigator.clipboard.writeText(window.location.href);
-        toast({
-          title: "Link Copied",
-          description: "Dashboard link has been copied to clipboard",
-        });
+      // If already playing, stop current audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        setIsPlaying(false);
       }
-    } catch (err) {
+
+      const summary = generateSummary();
+      
       toast({
-        title: "Share Failed",
-        description: "Unable to share insights. Please try again.",
+        title: "Generating voice summary...",
+        description: "Please wait while we process your request.",
+      });
+
+      const response = await fetch('/api/text-to-speech', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: summary
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to generate speech');
+      }
+
+      const audioBlob = await response.blob();
+      const newAudioUrl = URL.createObjectURL(audioBlob);
+      
+      // Clean up old audio URL if it exists
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
+      }
+      
+      setAudioUrl(newAudioUrl);
+      
+      // Create new audio element
+      const audio = new Audio(newAudioUrl);
+      audioRef.current = audio;
+      
+      // Add event listeners
+      audio.addEventListener('ended', () => {
+        setIsPlaying(false);
+      });
+      
+      audio.addEventListener('error', (e) => {
+        console.error('Audio playback error:', e);
+        toast({
+          title: "Error",
+          description: "Failed to play audio",
+          variant: "destructive",
+        });
+        setIsPlaying(false);
+      });
+
+      // Start playing
+      await audio.play();
+      setIsPlaying(true);
+      
+      toast({
+        title: "Playing summary",
+        description: "Your dashboard insights are being read aloud.",
+      });
+
+    } catch (error: any) {
+      console.error('Error generating speech:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate voice summary",
         variant: "destructive",
       });
+      setIsPlaying(false);
     }
+  };
+
+  // Clean up audio URL when component unmounts
+  React.useEffect(() => {
+    return () => {
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
+      }
+    };
+  }, [audioUrl]);
+
+  // Generate summary text from mock data
+  const generateSummary = () => {
+    const topPersonas = personaRankings
+      .slice(0, 2)
+      .map(p => `${p.persona} at ${p.percentage}%`)
+      .join(" and ");
+
+    const topTraits = traitInsights
+      .slice(0, 2)
+      .map(t => t.trait)
+      .join(" and ");
+
+    const recentTrend = insights[0].description;
+    const userSatisfaction = insights[2].description;
+
+    const countryStats = countryDistribution
+      .slice(0, 3)
+      .map(c => c.country)
+      .join(", ");
+
+    return `
+      Welcome to your PersonaSync Dashboard Summary.
+      
+      Our community is thriving with ${dashboardStats.totalResponses} total survey responses.
+      The dominant personality types are ${topPersonas}.
+      The most common traits observed are ${topTraits}.
+      
+      Recent trends show that ${recentTrend}.
+      Regarding user satisfaction, ${userSatisfaction}.
+      
+      Our global community spans across ${countryStats}, with active members contributing daily.
+      
+      Users have earned an average of ${dashboardStats.averageXp} XP points through meaningful interactions.
+      
+      Thank you for being part of our growing community!
+    `;
   };
 
   return (
     <DashboardLayout>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold">Dashboard</h1>
+        <div className="flex gap-2">
+          {audioUrl ? (
+            <Button
+              variant="outline"
+              onClick={togglePlayPause}
+              className="flex items-center gap-2"
+            >
+              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+              {isPlaying ? 'Pause Summary' : 'Play Summary'}
+            </Button>
+          ) : null}
+          <Button onClick={handleShareInsights} className="flex items-center gap-2">
+            <FileSpreadsheet className="h-4 w-4" />
+            Generate Summary
+          </Button>
+        </div>
+      </div>
       <div className="space-y-8">
         {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

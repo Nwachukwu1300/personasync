@@ -175,7 +175,6 @@ export const mockSurveyResponses: SurveyResponse[] = [
       { questionId: 'q3', answer: 'Agree' }
     ]
   },
-  // Add more mock responses...
 ]
 
 // Mock trait insights
