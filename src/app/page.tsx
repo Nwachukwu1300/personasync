@@ -53,9 +53,9 @@ export default function Home() {
               className="flex flex-col sm:flex-row gap-4 justify-center"
             >
               <Button asChild size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold px-8 py-4 rounded-2xl shadow-xl transform hover:scale-105 transition-all">
-                <Link href="/onboarding" className="flex items-center gap-2">
-                  <Play className="w-5 h-5" />
-                  Start Your Journey
+                <Link href="/voice-survey" className="flex items-center gap-2">
+                  <Mic className="w-5 h-5" />
+                  🎙️ Chat with Nova
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="border-2 border-purple-300 text-purple-600 hover:bg-purple-50 font-semibold px-8 py-4 rounded-2xl">
