@@ -20,7 +20,7 @@ const mockUsers = [
     avatarUrl: "https://api.dicebear.com/6.x/thumbs/svg?seed=Marcus",
     bio: "Dreamer and storyteller who finds beauty in everyday moments.",
     joinedAt: "2025-01-08",
-    region: "San Francisco, USA"
+    region: "London, UK"
   },
   {
     id: 3,
@@ -55,7 +55,7 @@ const mockUsers = [
     avatarUrl: "https://api.dicebear.com/6.x/thumbs/svg?seed=Alex",
     bio: "Digital native who transforms ideas into innovative tech solutions.",
     joinedAt: "2025-01-13",
-    region: "Silicon Valley, USA"
+    region: "Birmingham, UK"
   },
   {
     id: 6,
@@ -396,14 +396,14 @@ const mockUsers = [
   // Additional Tech Enthusiast Users (4)
   {
     id: 35,
-    name: "Nova Singh",
+    name: "Mmesoma",
     email: "nova.singh@quantum.com",
     xp: 96,
     personalityType: "Tech Enthusiast",
     avatarUrl: "https://api.dicebear.com/6.x/thumbs/svg?seed=Nova",
     bio: "Quantum computing researcher pioneering the next generation of technology.",
     joinedAt: "2025-01-03",
-    region: "Toronto, Canada"
+    region: "London, UK"
   },
   {
     id: 36,
@@ -512,14 +512,14 @@ const mockUsers = [
   // Additional Bold Visionary Users (4)
   {
     id: 45,
-    name: "Storm Anderson",
-    email: "storm.anderson@disrupt.com",
-    xp: 98,
+    name: "Tobi Salaw",
+    email: "tobi.salami@disrupt.com",
+    xp: 150,
     personalityType: "Bold Visionary",
     avatarUrl: "https://api.dicebear.com/6.x/thumbs/svg?seed=Storm",
     bio: "Serial entrepreneur revolutionizing industries through fearless innovation.",
     joinedAt: "2025-01-02",
-    region: "San Francisco, USA"
+    region: "London, UK"
   },
   {
     id: 46,

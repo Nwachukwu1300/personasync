@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -35,7 +35,8 @@ import {
   TrendingUp,
   Clock,
   Target,
-  Award
+  Award,
+  MapPin
 } from 'lucide-react';
 import {
   surveyResponses,
@@ -45,6 +46,7 @@ import {
   insights,
   dailyCompletions
 } from '@/lib/mock-survey-data';
+import mockUsers from '@/lib/mock-users';
 import { generateBusinessReport, generateCSV } from '@/lib/export-utils';
 
 // Calculate dashboard stats
@@ -60,6 +62,28 @@ const COLORS = ['#9333ea', '#db2777', '#4f46e5', '#0891b2'];
 
 export default function DashboardPage() {
   const { toast } = useToast();
+
+  // Calculate country distribution
+  const countryDistribution = useMemo(() => {
+    const mainCountries = ['USA', 'UK', 'India', 'Japan', 'France', 'Germany', 'Australia'];
+    
+    const distribution = mockUsers.reduce((acc: { [key: string]: number }, user) => {
+      let country = user.region.split(', ')[1] || user.region;
+      
+      // Normalize country names to match main countries
+      if (country === 'United States' || country.includes('USA')) country = 'USA';
+      else if (country === 'United Kingdom' || country.includes('UK')) country = 'UK';
+      else if (!mainCountries.includes(country)) country = 'Other';
+      
+      acc[country] = (acc[country] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.entries(distribution)
+      .map(([country, count]) => ({ country, count }))
+      .filter(item => item.country !== 'Other') // Remove "Other" category
+      .sort((a, b) => b.count - a.count);
+  }, []);
 
   // Handle export to CSV
   const handleExportCSV = () => {
@@ -189,6 +213,33 @@ export default function DashboardPage() {
                     <YAxis />
                     <Tooltip />
                     <Bar dataKey="count" fill="#9333ea" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Country Distribution Chart */}
+          <Card className="bg-white/50 backdrop-blur-sm border-0 shadow-lg">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-purple-600" />
+                <CardTitle>User Distribution by Country</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={countryDistribution} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis dataKey="country" type="category" width={100} />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#4f46e5">
+                      {countryDistribution.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
