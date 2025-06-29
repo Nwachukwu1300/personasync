@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
-import { User, Sparkles, UserPlus, Gift, LogOut } from "lucide-react";
+import { User, Sparkles, UserPlus, Gift, LogOut, Users } from "lucide-react";
 import UserNav from "@/components/UserNav";
 
 const geistSans = Geist({
@@ -42,6 +42,14 @@ export default function RootLayout({
 
               {/* Navigation Links */}
               <div className="flex items-center space-x-4">
+                <Link 
+                  href="/communities" 
+                  className="flex items-center space-x-1 text-gray-600 hover:text-purple-600 transition-colors"
+                >
+                  <Users className="w-4 h-4" />
+                  <span className="text-sm font-medium">Communities</span>
+                </Link>
+                
                 <Link 
                   href="/rewards" 
                   className="flex items-center space-x-1 text-gray-600 hover:text-purple-600 transition-colors"
