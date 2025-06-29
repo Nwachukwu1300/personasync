@@ -101,7 +101,7 @@ export const SURVEYS: Survey[] = [
     category: "feedback",
     emoji: "⭐",
     estimatedTime: 7,
-    xpReward: 200,
+    xpReward: 150,
     questions: [
       {
         id: "usageFrequency",
@@ -162,7 +162,7 @@ export const SURVEYS: Survey[] = [
     category: "feature",
     emoji: "💡",
     estimatedTime: 6,
-    xpReward: 180,
+    xpReward: 150,
     questions: [
       {
         id: "missingFeatures",

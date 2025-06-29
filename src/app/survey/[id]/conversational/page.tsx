@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,6 +21,16 @@ import { generateAvatar } from '@/lib/surveys';
 import { AvatarTrait } from '@/lib/types';
 import { UserSession } from '@/lib/user-session';
 
+interface CompletionData {
+  avatar: {
+    title: string;
+    description: string;
+    traits: AvatarTrait[];
+  };
+  xpEarned: number;
+  alreadyCompleted: boolean;
+}
+
 export default function ConversationalSurveyPage() {
   const params = useParams();
   const router = useRouter();
@@ -31,6 +41,16 @@ export default function ConversationalSurveyPage() {
   const [earnedXP, setEarnedXP] = React.useState(0);
   const [avatar, setAvatar] = React.useState<any>(null);
   const [alreadyCompleted, setAlreadyCompleted] = React.useState(false);
+  const [showCompletion, setShowCompletion] = React.useState(false);
+  const [completionData, setCompletionData] = React.useState<CompletionData>({
+    avatar: {
+      title: '',
+      description: '',
+      traits: []
+    },
+    xpEarned: 0,
+    alreadyCompleted: false
+  });
 
   // Find the current survey
   const survey = SURVEYS.find(s => s.id === params.id);
@@ -75,32 +95,32 @@ export default function ConversationalSurveyPage() {
     if (currentQuestionIndex < survey.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      // Survey completed - get XP reward from survey definition
-      const xp = survey.xpReward;
-      const generatedAvatar = generateAvatar(newTraits);
-      
-      // Save XP to user's profile if logged in (prevent duplicate completions)
-      let earnedXP = 0;
-      let wasAlreadyCompleted = false;
-      if (UserSession.isLoggedIn()) {
-        const result = UserSession.completeSurvey(survey.id, xp);
-        earnedXP = result.xpEarned;
-        wasAlreadyCompleted = result.alreadyCompleted;
-        
-        // Show different message if already completed
-        if (result.alreadyCompleted) {
-          console.log('Survey already completed - no additional XP awarded');
-        }
-      }
-      
-      setEarnedXP(earnedXP);
-      setAlreadyCompleted(wasAlreadyCompleted);
-      setAvatar(generatedAvatar);
-      setIsCompleted(true);
+      handleSurveyComplete();
     }
   };
 
-  if (isCompleted) {
+  const handleSurveyComplete = () => {
+    if (!UserSession.isLoggedIn()) {
+      router.push('/signup');
+      return;
+    }
+
+    // Save XP to user's profile if logged in (prevent duplicate completions)
+    const result = UserSession.completeSurvey(survey.id, survey.xpReward);
+    
+    // Generate avatar based on traits
+    const generatedAvatar = generateAvatar(selectedTraits);
+    
+    // Show completion screen with XP earned
+    setCompletionData({
+      avatar: generatedAvatar,
+      xpEarned: result.xpEarned,
+      alreadyCompleted: result.alreadyCompleted
+    });
+    setShowCompletion(true);
+  };
+
+  if (showCompletion) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 flex items-center justify-center p-4">
         <motion.div
@@ -144,13 +164,13 @@ export default function ConversationalSurveyPage() {
                   </div>
                   <div className="flex-1">
                     <div className="text-2xl font-bold text-purple-600 mb-2">
-                      {avatar.title}
+                      {completionData.avatar.title}
                     </div>
                     <p className="text-gray-600 text-lg mb-4">
-                      {avatar.description}
+                      {completionData.avatar.description}
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {avatar.traits.map((trait: AvatarTrait, index: number) => (
+                      {completionData.avatar.traits.map((trait: AvatarTrait, index: number) => (
                         <motion.span
                           key={index}
                           initial={{ opacity: 0, scale: 0.5 }}
@@ -175,22 +195,22 @@ export default function ConversationalSurveyPage() {
                 className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"
               >
                 {/* XP Card */}
-                <Card className={`border-0 rounded-2xl overflow-hidden ${alreadyCompleted ? 'bg-gradient-to-r from-blue-50 to-purple-50' : 'bg-gradient-to-r from-yellow-50 to-orange-50'}`}>
+                <Card className={`border-0 rounded-2xl overflow-hidden ${completionData.alreadyCompleted ? 'bg-gradient-to-r from-blue-50 to-purple-50' : 'bg-gradient-to-r from-yellow-50 to-orange-50'}`}>
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-3">
-                      <div className={`text-lg font-bold ${alreadyCompleted ? 'text-blue-700' : 'text-yellow-700'}`}>
-                        {alreadyCompleted ? 'Survey Retaken' : 'XP Earned'}
+                      <div className={`text-lg font-bold ${completionData.alreadyCompleted ? 'text-blue-700' : 'text-yellow-700'}`}>
+                        {completionData.alreadyCompleted ? 'Survey Retaken' : 'XP Earned'}
                       </div>
                       <div className="flex items-center gap-2 bg-white rounded-full px-3 py-1 shadow-sm">
-                        <Star className={`w-5 h-5 fill-current ${alreadyCompleted ? 'text-blue-500' : 'text-yellow-500'}`} />
-                        <span className={`text-xl font-bold ${alreadyCompleted ? 'text-blue-700' : 'text-yellow-700'}`}>
-                          {alreadyCompleted ? '0' : `+${earnedXP}`}
+                        <Star className={`w-5 h-5 fill-current ${completionData.alreadyCompleted ? 'text-blue-500' : 'text-yellow-500'}`} />
+                        <span className={`text-xl font-bold ${completionData.alreadyCompleted ? 'text-blue-700' : 'text-yellow-700'}`}>
+                          {completionData.alreadyCompleted ? '0' : `+${completionData.xpEarned}`}
                         </span>
                       </div>
                     </div>
-                    <Progress value={alreadyCompleted ? 50 : 100} className={`h-3 mb-2 ${alreadyCompleted ? 'bg-blue-200' : 'bg-yellow-200'}`} />
-                    <p className={`text-sm ${alreadyCompleted ? 'text-blue-600' : 'text-yellow-600'}`}>
-                      {alreadyCompleted ? 'No additional XP for retaking surveys, but great job exploring!' : 'Great job! Keep going to level up!'}
+                    <Progress value={completionData.alreadyCompleted ? 50 : 100} className={`h-3 mb-2 ${completionData.alreadyCompleted ? 'bg-blue-200' : 'bg-yellow-200'}`} />
+                    <p className={`text-sm ${completionData.alreadyCompleted ? 'text-blue-600' : 'text-yellow-600'}`}>
+                      {completionData.alreadyCompleted ? 'No additional XP for retaking surveys, but great job exploring!' : 'Great job! Keep going to level up!'}
                     </p>
                   </CardContent>
                 </Card>

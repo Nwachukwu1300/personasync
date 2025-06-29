@@ -622,23 +622,18 @@ export default function VoiceSurveyPage() {
                 </CardContent>
               </Card>
 
-              {/* Progress */}
-              <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm rounded-3xl">
-                <CardContent className="p-6">
-                  <h3 className="font-bold text-gray-900 mb-4">Chat Progress</h3>
-                  <div className="space-y-3">
-                    <Progress value={(Object.keys(surveyData).length / 5) * 100} className="h-3" />
-                    <p className="text-sm text-gray-600">
-                      {Object.keys(surveyData).length} insights collected
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Hidden Progress - Data collection continues but UI is hidden */}
+              <div className="hidden">
+                <Progress value={(Object.keys(surveyData).length / 5) * 100} className="h-3" />
+                <p className="text-sm text-gray-600">
+                  {Object.keys(surveyData).length} insights collected
+                </p>
+              </div>
 
-              {/* Current Insights */}
-              {Object.keys(surveyData).length > 0 && (
-                <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm rounded-3xl">
-                  <CardContent className="p-6">
+              {/* Hidden Insights - Data collection continues but UI is hidden */}
+              <div className="hidden">
+                {Object.keys(surveyData).length > 0 && (
+                  <div>
                     <h3 className="font-bold text-gray-900 mb-4">What I've Learned</h3>
                     <div className="space-y-2">
                       {Object.entries(surveyData).map(([key, value]) => (
@@ -650,9 +645,9 @@ export default function VoiceSurveyPage() {
                         </div>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
-              )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
