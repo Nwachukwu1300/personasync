@@ -57,12 +57,12 @@ export const surveyResponses: SurveyResponse[] = [
 
 // Mock daily completion data
 export const dailyCompletions: DailyStats[] = [
-  { date: '2024-03-15', completions: 120 },
-  { date: '2024-03-16', completions: 150 },
-  { date: '2024-03-17', completions: 180 },
-  { date: '2024-03-18', completions: 200 },
-  { date: '2024-03-19', completions: 220 },
-  { date: '2024-03-20', completions: 250 }
+  { date: '2025-06-27', completions: 120 },
+  { date: '2025-06-28', completions: 150 },
+  { date: '2025-06-29', completions: 180 },
+  { date: '2025-06-30', completions: 200 },
+  { date: '2025-06-30', completions: 220 },
+  { date: '2025-07-01', completions: 250 }
 ];
 
 // Mock response distribution data
