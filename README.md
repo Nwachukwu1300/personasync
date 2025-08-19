@@ -2,6 +2,8 @@
 
 ## 🧀 Product Name: PersonaSync
 
+## Youtube Demo link - https://www.youtube.com/watch?v=dJ5p53Ijlkg
+
 ## 🌟 Vision
 
 Create an engaging, voice-powered survey experience that generates personality-based avatars, rewards users with XP, and builds community through avatar identity. The platform reimagines boring forms by making them conversational, gamified, and rewarding — turning raw data into real human insight.
